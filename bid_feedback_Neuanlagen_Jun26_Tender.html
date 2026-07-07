@@ -554,7 +554,7 @@
         <div class="header">
             <div class="logo-placeholder">EUROWIND ENERGY GMBH</div>
             <h1>Eurowind DE - Tender Feedback Tool 2026</h1>
-            <p>DE 2026er+27er Neuanlagen (Jun 26-Tender) — Status 07.07.2026</p>
+            <p>DE 2026er+27er Neuanlagen (Jun 26-Tender) — Status 06.07.2026</p>
         </div>
 
         <div class="content">
@@ -879,6 +879,7 @@
             if (view === 'detail') {
                 document.getElementById('detailView').classList.add('active');
                 document.querySelector('[onclick="switchView(\'detail\')"]').classList.add('active');
+                updateDetailView();
             } else if (view === 'comparison') {
                 document.getElementById('comparisonView').classList.add('active');
                 document.querySelector('[onclick="switchView(\'comparison\')"]').classList.add('active');
