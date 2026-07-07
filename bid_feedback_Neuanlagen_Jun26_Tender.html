@@ -617,7 +617,7 @@
             }
         };
 
-        let selectedTrader = data.traders[0];
+        let selectedTrader = [...data.traders].sort((a, b) => a.localeCompare(b))[0];
 
         function initTraderButtons() {
             const container = document.getElementById('traderButtons');
