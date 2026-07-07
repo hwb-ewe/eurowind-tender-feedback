@@ -621,7 +621,7 @@
 
         function initTraderButtons() {
             const container = document.getElementById('traderButtons');
-            data.traders.forEach(trader => {
+            [...data.traders].sort((a, b) => a.localeCompare(b)).forEach(trader => {
                 const btn = document.createElement('button');
                 btn.className = `trader-btn ${trader === selectedTrader ? 'active' : ''}`;
                 const product = data.products && data.products[trader] ? data.products[trader] : '';
@@ -637,7 +637,7 @@
                 btn.classList.remove('active');
                 if (btn.textContent.includes(trader)) btn.classList.add('active');
             });
-            updateDetailView();
+            switchView('detail');
         }
 
         function getColorClass(delta) {
@@ -768,7 +768,7 @@
 
         function updateComparisonView() {
             let html = '';
-            data.traders.forEach(trader => {
+            [...data.traders].sort((a, b) => a.localeCompare(b)).forEach(trader => {
                 const stats = calculateTraderStats(trader);
                 const compStats = calculateComparisonStats(trader);
                 const product = data.products && data.products[trader] ? data.products[trader] : 'Unknown';
