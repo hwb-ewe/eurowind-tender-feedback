@@ -1151,39 +1151,76 @@
             const rows = (parkData?.anlagen || []).map(a => {
                 const mw = a.leistung_mw > 0 ? Number(a.leistung_mw).toFixed(2) : '–';
                 const ag = a.age_group || '–';
-                return [
-                    a.wea_id ?? '',
-                    a.wind_farm_name ?? '',
-                    a.mastr_id ?? '',
-                    a.anlagentyp ?? '',
-                    a.oem ?? '',
-                    a.dso ?? '',
-                    a.tso ?? '',
-                    ag,
-                    mw
-                ];
+                return {
+                    wea_id: a.wea_id ?? '',
+                    wind_farm_name: a.wind_farm_name ?? '',
+                    mastr_id: a.mastr_id ?? '',
+                    mastr_detail_id: a.mastr_detail_id ?? '',
+                    anlagentyp: a.anlagentyp ?? '',
+                    oem: a.oem ?? '',
+                    dso: a.dso ?? '',
+                    tso: a.tso ?? '',
+                    age_group: ag,
+                    leistung_mw: mw
+                };
             });
 
             const headers = ['OEM Serial Number', 'Wind farm name', 'MaStR-ID', 'Typ', 'OEM', 'DSO', 'TSO', '20+-Gruppe', 'Leistung (MW)'];
 
-            const htmlRows = rows.map(cells =>
-                `<tr>${cells.map(c => `<td style="border:1px solid #d6deea;padding:6px 8px;font-family:Arial,sans-serif;font-size:12px;color:#1f2937;">${escapeHtml(c)}</td>`).join('')}</tr>`
-            ).join('');
+            const tableStyle = 'border-collapse:collapse;width:100%;max-width:1300px;';
+            const captionStyle = 'caption-side:top;text-align:left;font-size:18px;font-weight:700;color:#041E42;padding-bottom:12px;';
+            const headerCellStyle = 'border:none;border-bottom:2px solid #041E42;background:transparent;padding:12px 8px;text-align:left;font-size:15px;font-weight:700;color:#041E42;';
+            const cellStyle = 'padding:8px 5px;font-size:13px;color:black;';
+
+            const htmlRows = rows.map((row, index) => {
+                const mastrLabel = escapeHtml(row.mastr_id);
+                const mastrUrl = buildMastrDetailUrl(row.mastr_detail_id);
+                const mastrCell = mastrUrl
+                    ? `<a href="${escapeHtml(mastrUrl)}" target="_blank" rel="noopener noreferrer" style="color:#041E42;text-decoration:underline;">${mastrLabel}</a>`
+                    : mastrLabel;
+                const rowStyle = index % 2 === 0
+                    ? 'background:#F5F9FF;border-bottom:1px solid #ABCAF6;'
+                    : 'background:#FFFFFF;border-bottom:1px solid #ABCAF6;';
+
+                return `
+                    <tr style="${rowStyle}">
+                        <td style="${cellStyle}">${escapeHtml(row.wea_id)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.wind_farm_name)}</td>
+                        <td style="${cellStyle}">${mastrCell}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.anlagentyp)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.oem)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.dso)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.tso)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.age_group)}</td>
+                        <td style="${cellStyle}">${escapeHtml(row.leistung_mw)}</td>
+                    </tr>
+                `;
+            }).join('');
 
             const html = `
-                <table style="border-collapse:collapse;width:100%;max-width:1100px;">
-                    <caption style="caption-side:top;text-align:left;font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#0b2f5b;padding-bottom:8px;">Assets - ${escapeHtml(parkName)}</caption>
+                <table style="${tableStyle}">
+                    <caption style="${captionStyle}">Eurowind DE Assets - ${escapeHtml(parkName)}</caption>
                     <thead>
-                        <tr>${headers.map(h => `<th style="border:1px solid #c7d3e8;background:#eaf0fb;padding:7px 8px;text-align:left;font-family:Arial,sans-serif;font-size:12px;color:#0b2f5b;">${escapeHtml(h)}</th>`).join('')}</tr>
+                        <tr>${headers.map(h => `<th style="${headerCellStyle}">${escapeHtml(h)}</th>`).join('')}</tr>
                     </thead>
                     <tbody>${htmlRows}</tbody>
                 </table>
             `.trim();
 
             const plain = [
-                `Assets - ${parkName}`,
+                `Eurowind DE Assets - ${parkName}`,
                 headers.join('\t'),
-                ...rows.map(cells => cells.join('\t'))
+                ...rows.map(row => [
+                    row.wea_id,
+                    row.wind_farm_name,
+                    row.mastr_id,
+                    row.anlagentyp,
+                    row.oem,
+                    row.dso,
+                    row.tso,
+                    row.age_group,
+                    row.leistung_mw
+                ].join('\t'))
             ].join('\n');
 
             return { html, plain };
